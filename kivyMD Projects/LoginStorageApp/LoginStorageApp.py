@@ -120,6 +120,12 @@ ScreenManager:
         font_style : 'H2'
         halign : 'center'
         pos_hint : {'center_y':0.7}
+        
+	MDRaisedButton:
+        pos_hint:{'center_x':.5,'center_y':.3}
+        text:'Log Out'
+        on_release:app.delete()
+    
     
 
 '''
@@ -160,15 +166,15 @@ class NewApp(MDApp):
         self.dialog.dismiss()
 
     def show_date_picker(self):
-        date_dialog = MDDatePicker(callback = self.get_date,year = 1999,month = 1,day =1,)
+        date_dialog = MDDatePicker(year = 1999,month = 1,day =1)
+        date_dialog.bind(on_save=self.get_date)
         date_dialog.open()
-    def get_date(self,date):
-        self.dob = date
-        self.strng.get_screen('dob').ids.date_picker.text = str(self.dob)
+    def get_date(self,*args):
+        self.strng.get_screen('dob').ids.date_picker.text = str(args[1])
         self.strng.get_screen('dob').ids.second_disabled.disabled = False
 
         #Storing of DATA
-        self.store.put('UserInfo',name = self.username_text,dob = str(self.dob))
+        self.store.put('UserInfo',name = self.username_text,dob = str(args[1]))
         self.username_changer()
 
     def username_changer(self):
@@ -183,6 +189,10 @@ class NewApp(MDApp):
                 
         except KeyError:
             self.strng.get_screen('welcomescreen').manager.current = 'welcomescreen'
+			
+    def delete(self):
+        self.store.delete('UserInfo')
+        self.strng.get_screen('welcomescreen').manager.current = 'welcomescreen'
 
 
 NewApp().run()
